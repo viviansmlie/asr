@@ -1,44 +1,24 @@
-# ASR 评测系统
+# ASR Leaderboard
 
-## 项目简介
+This repository contains a bilingual (English + Chinese) ASR evaluation leaderboard.
 
-本项目是一个用于语音模型评测的工具集，主要针对 Speech 模型进行性能评估和测试。目前重点实现了 ASR（自动语音识别，Automatic Speech Recognition）模型的评测功能。
+## Leaderboards
+- English leaderboard: `asr-leaderboard/leaderboards/en.md`
+- Chinese leaderboard: `asr-leaderboard/leaderboards/zh.md`
 
-## 主要功能
+## Evaluation rules
+- Rules and normalization: `asr-leaderboard/EVAL_RULES.md`
 
-### ASR 评测
-- 对自动语音识别模型进行准确性评估
-- 支持多种评测指标，包括：
-  - WER（词错误率，Word Error Rate）
-  - CER（字符错误率，Character Error Rate）
-  - 识别准确率统计
-- 提供详细的评测报告和分析结果
+## How to submit results
+1. Follow the mandatory rules in `asr-leaderboard/EVAL_RULES.md` (normalization + tokenization + metric definitions).
+2. Add a new run folder under `asr-leaderboard/runs/YYYY-MM-DD_<model-name>/` including:
+   - `README.md` describing model, decoding, segmentation, and artifact/commit.
+   - (Optional) `refs/` and `hyps/` transcripts and `scores.md` for reproducibility.
+3. Update the appropriate leaderboard table:
+   - `asr-leaderboard/leaderboards/en.md`
+   - `asr-leaderboard/leaderboards/zh.md`
 
-## 功能特性
-
-- 🎯 **多模型支持**：可评测不同架构的 ASR 模型
-- 📊 **丰富的评测指标**：提供全面的性能分析数据
-- 🔧 **灵活配置**：支持自定义评测参数和数据集
-- 📈 **可视化结果**：生成直观的评测报告
-
-## 适用场景
-
-- ASR 模型性能对比
-- 模型优化效果验证
-- 语音识别系统质量评估
-- 研究与开发中的模型测试
-
-## 未来规划
-
-- 扩展更多语音评测类型（如 TTS、语音分离等）
-- 支持更多语言和方言的评测
-- 增加实时评测功能
-- 提供在线评测服务
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request 来帮助改进本项目。
-
-## 许可证
-
-本项目采用开源许可证，详情请查看 LICENSE 文件。
+## Directory layout
+- `asr-leaderboard/EVAL_RULES.md`: single source of truth for evaluation policy
+- `asr-leaderboard/leaderboards/`: leaderboard tables
+- `asr-leaderboard/runs/`: per-run provenance
