@@ -1,38 +1,48 @@
-# ASR Evaluation (EN WER + ZH CER)
+# ASR Evaluation Toolkit (EN WER + ZH CER)
 
-This folder provides a minimal, reproducible scoring toolkit consistent with `../EVAL_RULES.md`.
+This toolkit is consistent with `../../asr-leaderboard/EVAL_RULES.md` and supports:
+- Input format: `utt_id<TAB>text`
+- Alignment: join by `utt_id`
+- English: WER (whitespace tokens after normalization)
+- Chinese: CER (character tokens after normalization), **Traditional->Simplified enabled by default**
+- Batch evaluation via YAML config, and output Markdown rows for leaderboards
 
-## What it does
-- English: normalization + **WER** (whitespace tokenization)
-- Chinese: normalization + **CER** (character tokenization)
-- Reports: S/D/I counts, N (reference tokens), and error rate %
-
-## Input format
-Two text files:
-- `ref.txt`: one utterance per line
-- `hyp.txt`: one utterance per line
-Lines are matched by line number (1-to-1). Empty lines are allowed.
-
-## Usage
-
-### English WER
+## Install
 ```bash
-python asr-leaderboard/eval/score.py --lang en --ref path/to/ref.txt --hyp path/to/hyp.txt
+pip install -r asr-leaderboard/eval/requirements.txt
 ```
 
-### Chinese CER
+## Quick test (toy examples)
 ```bash
-python asr-leaderboard/eval/score.py --lang zh --ref path/to/ref.txt --hyp path/to/hyp.txt
+python asr-leaderboard/eval/score.py --lang en \
+  --ref asr-leaderboard/eval/example/ref_en.tsv \
+  --hyp asr-leaderboard/eval/example/hyp_en.tsv
+
+python asr-leaderboard/eval/score.py --lang zh \
+  --ref asr-leaderboard/eval/example/ref_zh.tsv \
+  --hyp asr-leaderboard/eval/example/hyp_zh.tsv
 ```
 
-### Example
+## Run multiple datasets (YAML)
+1) Copy example config:
 ```bash
-python asr-leaderboard/eval/score.py --lang en --ref asr-leaderboard/eval/example/refs_en.txt --hyp asr-leaderboard/eval/example/hyps_en.txt
-python asr-leaderboard/eval/score.py --lang zh --ref asr-leaderboard/eval/example/refs_zh.txt --hyp asr-leaderboard/eval/example/hyps_zh.txt
+cp asr-leaderboard/eval/config.example.yaml my_eval.yaml
 ```
 
-## Notes on rules
-- EN normalization follows: lowercase, replace non `[a-z0-9 ]` with spaces, collapse spaces, trim.
-- ZH normalization follows: full-width->half-width, remove spaces, remove punctuation, keep digits/latin, char tokenization.
+2) Edit paths in `my_eval.yaml` (refs/hyps prepared by you)
 
-For dataset download guidance, see `download_data.md` (documentation only, no redistribution).
+3) Run:
+```bash
+python asr-leaderboard/eval/run_eval.py --config my_eval.yaml
+```
+
+It will print:
+- Per-task S/D/I/N + WER/CER
+- A Markdown table row you can paste into:
+  - `asr-leaderboard/leaderboards/en.md`
+  - `asr-leaderboard/leaderboards/zh.md`
+
+## Data
+This repo does NOT redistribute LibriSpeech/TED-LIUM/AISHELL/HKUST/Hub5'00.
+Use official sources and licenses; prepare `ref.tsv` and `hyp.tsv` files in the required format.
+See `prepare_data.py` for format helpers.

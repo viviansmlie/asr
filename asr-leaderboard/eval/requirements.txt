@@ -1,3 +1,3 @@
-# Requirements for the evaluation toolkit
-
-# Add dependencies here
+# No external deps required (pure Python).
+PyYAML>=6.0
+opencc-python-reimplemented>=0.1.7

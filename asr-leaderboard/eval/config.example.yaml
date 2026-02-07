@@ -1,0 +1,64 @@
+meta:
+  model: "ExampleModel v1"
+  params: "120M"
+  decode: "beam=10"
+  lm: "none"
+  date: "2026-02-07"
+  artifact: "abcdef1"
+  notes: "t2s enabled for zh"
+
+defaults:
+  zh_t2s: true
+
+# keys are used for rendering markdown rows; you can add more tasks if needed
+tasks:
+  # English
+  - key: librispeech_test_clean
+    lang: en
+    ref: /path/to/LibriSpeech/test-clean/ref.tsv
+    hyp: /path/to/LibriSpeech/test-clean/hyp.tsv
+
+  - key: librispeech_test_other
+    lang: en
+    ref: /path/to/LibriSpeech/test-other/ref.tsv
+    hyp: /path/to/LibriSpeech/test-other/hyp.tsv
+
+  - key: tedlium3_test
+    lang: en
+    ref: /path/to/TEDLIUM3/test/ref.tsv
+    hyp: /path/to/TEDLIUM3/test/hyp.tsv
+
+  # Optional / licensed
+  - key: hub5_00_swb
+    lang: en
+    ref: /path/to/Hub5_00/swb/ref.tsv
+    hyp: /path/to/Hub5_00/swb/hyp.tsv
+
+  - key: hub5_00_ch
+    lang: en
+    ref: /path/to/Hub5_00/ch/ref.tsv
+    hyp: /path/to/Hub5_00/ch/hyp.tsv
+
+  # Chinese
+  - key: aishell1_test
+    lang: zh
+    ref: /path/to/AISHELL-1/test/ref.tsv
+    hyp: /path/to/AISHELL-1/test/hyp.tsv
+
+  # Optional / licensed
+  - key: hkust_test
+    lang: zh
+    ref: /path/to/HKUST/test/ref.tsv
+    hyp: /path/to/HKUST/test/hyp.tsv
+
+render:
+  # Optional: override order if your leaderboard columns differ
+  en_order:
+    - librispeech_test_clean
+    - librispeech_test_other
+    - tedlium3_test
+    - hub5_00_swb
+    - hub5_00_ch
+  zh_order:
+    - aishell1_test
+    - hkust_test

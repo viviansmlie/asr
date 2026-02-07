@@ -1,18 +1,24 @@
 import re
 import unicodedata
+from typing import Optional
 
-_EN_KEEP_RE = re.compile(r"[^a-z0-9 ]+")  # everything except a-z, 0-9, space
+try:
+    from opencc import OpenCC
+except Exception:  # pragma: no cover
+    OpenCC = None
+
+_EN_KEEP_RE = re.compile(r"[^a-z0-9 ]+")
 _EN_SPACE_RE = re.compile(r"\s+")
 
-def normalize_en(text: str) -> str:
+def normalize_en(text: Optional[str]) -> str:
     """
-    English normalization per EVAL_RULES.md:
-    1) lowercase
-    2) replace non [a-z0-9 ] with spaces
-    3) collapse spaces
-    4) trim
+    EN normalization:
+    - lowercase
+    - replace non [a-z0-9 ] with spaces
+    - collapse spaces
+    - trim
     """
-    if text is None:
+    if not text:
         return ""
     t = text.lower()
     t = _EN_KEEP_RE.sub(" ", t)
@@ -20,38 +26,44 @@ def normalize_en(text: str) -> str:
     return t
 
 
-# A conservative punctuation remover for Chinese:
-# - Normalize full-width to half-width via NFKC
-# - Remove whitespace
-# - Remove Unicode punctuation categories
-# - Keep digits and latin letters as-is
-def _is_punctuation(ch: str) -> bool:
+def _is_punctuation_or_symbol(ch: str) -> bool:
     cat = unicodedata.category(ch)
-    # P* are punctuation categories in Unicode
-    if cat.startswith("P"):
-        return True
-    # Also treat some common symbols as punctuation-like
-    if cat.startswith("S"):
-        # Keep currency/math symbols? For leaderboard simplicity, remove symbols.
-        return True
-    return False
+    # P* punctuation, S* symbols
+    return cat.startswith("P") or cat.startswith("S")
 
-def normalize_zh(text: str) -> str:
+
+class ZhNormalizer:
     """
-    Chinese normalization per EVAL_RULES.md:
-    1) full-width -> half-width (NFKC)
-    2) remove spaces
-    3) remove Chinese/English punctuation
-    4) keep digits and latin letters
+    ZH normalization:
+    - NFKC (full-width -> half-width)
+    - remove spaces
+    - remove punctuation/symbols
+    - Traditional -> Simplified (enabled by default)
     """
-    if text is None:
-        return ""
-    t = unicodedata.normalize("NFKC", text)
-    out = []
-    for ch in t:
-        if ch.isspace():
-            continue
-        if _is_punctuation(ch):
-            continue
-        out.append(ch)
-    return "".join(out)
+    def __init__(self, t2s: bool = True):
+        self.t2s = t2s
+        self._cc = None
+        if self.t2s:
+            if OpenCC is None:
+                raise RuntimeError(
+                    "opencc is required for Traditional->Simplified conversion. "
+                    "Install: pip install opencc-python-reimplemented"
+                )
+            # t2s: Traditional Chinese to Simplified Chinese
+            self._cc = OpenCC("t2s")
+
+    def __call__(self, text: Optional[str]) -> str:
+        if not text:
+            return ""
+        t = unicodedata.normalize("NFKC", text)
+        out = []
+        for ch in t:
+            if ch.isspace():
+                continue
+            if _is_punctuation_or_symbol(ch):
+                continue
+            out.append(ch)
+        t = "".join(out)
+        if self._cc is not None:
+            t = self._cc.convert(t)
+        return t
